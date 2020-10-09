@@ -1,5 +1,24 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hexcolor/hexcolor.dart';
+
+AppBar ChatAppBar({@required title, Function onLeaveTap}) =>
+    CustomAppBar(title: title, actions: [LeaveAction(onTapped: onLeaveTap)]);
+
+Widget LeaveAction({Function onTapped}) {
+  return Padding(
+    padding: EdgeInsets.only(right: 10),
+    child: IconButton(
+      icon: Icon(
+        Icons.exit_to_app,
+        color: Colors.amberAccent,
+        size: 30,
+      ),
+      onPressed: onTapped,
+    ),
+  );
+}
 
 AppBar CustomAppBar({@required title, List<Widget> actions}) => AppBar(
       title: Text(
@@ -14,17 +33,22 @@ AppBar CustomAppBar({@required title, List<Widget> actions}) => AppBar(
       toolbarHeight: 80,
       shadowColor: Colors.red,
       elevation: 1,
-      leading: Image.asset(
-        'assets/images/logo.png',
-        height: 30,
+      leading: Icon(
+        Icons.chat_bubble_outline,
+        color: Colors.amber,
+        size: 36,
       ),
-      backgroundColor: Colors.red[900],
+      backgroundColor: HexColor('#690356'),
       actions: actions,
     );
 
-FloatingActionButton FloatingAddButtonAction({Function onPressed}) => FloatingActionButton(
-  onPressed: onPressed,
-  child: Icon(Icons.add, color: Colors.white,),
-  backgroundColor: Colors.red,
-  elevation: 0.5,
-);
+FloatingActionButton FloatingAddButtonAction({Function onPressed}) =>
+    FloatingActionButton(
+      onPressed: onPressed,
+      child: Icon(
+        Icons.add,
+        color: Colors.white,
+      ),
+      backgroundColor: Colors.red,
+      elevation: 0.5,
+    );

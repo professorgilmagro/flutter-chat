@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hexcolor/hexcolor.dart';
 
 ThemeData ChatAppTheme() => ThemeData(
       brightness: Brightness.light,
@@ -27,7 +28,7 @@ ThemeData ChatAppTheme() => ThemeData(
 LinearGradient LinearGradientDefault() => LinearGradient(
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
-      colors: [Colors.deepPurple, Colors.purple],
+      colors: [HexColor("#690356"), HexColor("#8E0C76")],
     );
 
 Widget TextTitle(text, {padding, alignCenter}) {

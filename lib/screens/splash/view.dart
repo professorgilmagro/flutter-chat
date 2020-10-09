@@ -1,6 +1,7 @@
 import 'package:chat_app/screens/home/home.dart';
 import 'package:chat_app/theme/style.dart';
 import 'package:flutter/material.dart';
+import 'package:hexcolor/hexcolor.dart';
 import 'package:splashscreen/splashscreen.dart';
 
 class Splash extends StatefulWidget {
@@ -23,7 +24,7 @@ Widget _introScreen() {
         gradientBackground: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Colors.deepPurple, Colors.purple[900]],
+          colors: [HexColor("#690356"), HexColor("#8E0C76")],
         ),
         navigateAfterSeconds: Home(),
         loaderColor: Colors.transparent,

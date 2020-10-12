@@ -1,4 +1,4 @@
-import 'package:chat_app/screens/home/home.dart';
+import 'package:chat_app/screens/chat/home.dart';
 import 'package:chat_app/theme/style.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';

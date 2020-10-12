@@ -13,10 +13,13 @@ class Messenger {
   Messenger({this.text, this.pickedFile});
 
   send() async {
-    Message message = await _getMessageWithDefaultInformation();
+    Message message = _getMessageWithDefaultInformation();
 
     if (pickedFile != null) {
-      final task = await FileStorage.upload(file: File(pickedFile.path));
+      final task = await FileStorage.upload(
+        file: File(pickedFile.path),
+        owner: Auth().uid,
+      );
       message.imageUrl = (await task.ref.getDownloadURL()).toString();
     }
 
@@ -27,12 +30,11 @@ class Messenger {
     ChatRepository(message).push();
   }
 
-  Future<Message> _getMessageWithDefaultInformation() async {
-    final user = await Login().getUser();
+  Message _getMessageWithDefaultInformation() {
     return Message(
-      uid: user.uid,
-      senderPhotoUrl: user.photoUrl,
-      senderName: user.displayName,
+      uid: Auth().uid,
+      senderPhotoUrl: Auth().avatarUrl,
+      senderName: Auth().name,
       sendAt: DateTime.now(),
     );
   }

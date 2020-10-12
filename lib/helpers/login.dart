@@ -1,13 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-class Login {
-  static final Login _instance = Login.internal();
+class Auth {
+  static final Auth _instance = Auth.internal();
   FirebaseUser _user;
+  GoogleSignIn _google;
+  bool _fails = false;
 
-  factory Login() => _instance;
+  factory Auth() => _instance;
 
-  Login.internal();
+  Auth.internal();
 
   bool isLogged() {
     return _user != null;
@@ -15,6 +17,22 @@ class Login {
 
   bool isNotLogged() {
     return _user == null;
+  }
+
+  String get uid {
+    return isLogged() ? _user.uid : null;
+  }
+
+  String get name {
+    return isLogged() ? _user.displayName : null;
+  }
+
+  String get avatarUrl {
+    return isLogged() ? _user.photoUrl : null;
+  }
+
+  bool get isLoginFails {
+    return _fails;
   }
 
   set user(FirebaseUser user) {
@@ -26,11 +44,11 @@ class Login {
       return _user;
     }
 
-    await auth();
+    await signIn();
     return _user;
   }
 
-  Future<Login> auth() async {
+  Future<Auth> signIn() async {
     try {
       AuthCredential credential = await getGoogleCredentials();
       final AuthResult result =
@@ -38,14 +56,20 @@ class Login {
       _user = result.user;
     } catch (error) {
       _user = null;
+      _fails = true;
     }
 
     return this;
   }
 
+  signOut() {
+    FirebaseAuth.instance.signOut();
+    _google.signOut();
+  }
+
   Future<AuthCredential> getGoogleCredentials() async {
-    final GoogleSignIn google = GoogleSignIn();
-    final GoogleSignInAccount account = await google.signIn();
+    _google = GoogleSignIn();
+    final GoogleSignInAccount account = await _google.signIn();
     final GoogleSignInAuthentication auth = await account.authentication;
     return GoogleAuthProvider.getCredential(
       idToken: auth.idToken,

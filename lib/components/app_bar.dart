@@ -1,3 +1,4 @@
+import 'package:chat_app/helpers/login.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -9,14 +10,16 @@ AppBar ChatAppBar({@required title, Function onLeaveTap}) =>
 Widget LeaveAction({Function onTapped}) {
   return Padding(
     padding: EdgeInsets.only(right: 10),
-    child: IconButton(
-      icon: Icon(
-        Icons.exit_to_app,
-        color: Colors.amberAccent,
-        size: 30,
-      ),
-      onPressed: onTapped,
-    ),
+    child: Auth().isLogged()
+        ? IconButton(
+            icon: Icon(
+              Icons.exit_to_app,
+              color: Colors.amberAccent,
+              size: 30,
+            ),
+            onPressed: onTapped,
+          )
+        : Container(),
   );
 }
 

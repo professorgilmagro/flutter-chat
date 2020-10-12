@@ -42,6 +42,14 @@ class Message {
         : null;
   }
 
+  bool hasImage() {
+    return imageUrl != null;
+  }
+
+  bool isMine(String uuid) {
+    return this.uid == uuid;
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'uid': uid,

@@ -8,8 +8,9 @@ class SnackMessage {
   String textSuffix;
   bool undoAction = false;
   int seconds;
-
-  SnackMessage(this.context, this.description, {this.barAction, this.seconds});
+  GlobalKey<ScaffoldState> scaffoldKey;
+  SnackMessage(this.scaffoldKey, this.description,
+      {this.barAction, this.seconds});
 
   SnackBar get snack {
     return SnackBar(
@@ -55,8 +56,7 @@ class SnackMessage {
     );
   }
 
-  void show() {
-    Scaffold.of(context).removeCurrentSnackBar();
-    Scaffold.of(context).showSnackBar(snack);
+  show() {
+    return scaffoldKey.currentState.showSnackBar(snack);
   }
 }

@@ -9,20 +9,10 @@ ThemeData ChatAppTheme() => ThemeData(
       primaryColor: Colors.deepPurple,
       accentColor: Colors.purple,
       hintColor: Colors.yellow,
-      textTheme: TextTheme(
-        headline1: GoogleFonts.pompiere(
-            fontSize: 72.0,
-            fontWeight: FontWeight.bold,
-            decoration: TextDecoration.none),
-        headline6: GoogleFonts.pompiere(
-            fontSize: 36.0,
-            fontStyle: FontStyle.italic,
-            decoration: TextDecoration.none),
-        bodyText2: GoogleFonts.pompiere(
-            fontSize: 14.0, decoration: TextDecoration.none),
-        bodyText1: GoogleFonts.pompiere(
-            fontSize: 14.0, decoration: TextDecoration.none),
+      iconTheme: IconThemeData(
+        color: Colors.amber,
       ),
+      fontFamily: GoogleFonts.aladin().fontFamily,
     );
 
 LinearGradient LinearGradientDefault() => LinearGradient(

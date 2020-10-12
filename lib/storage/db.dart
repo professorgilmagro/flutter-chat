@@ -2,8 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 
 class DB {
+  static const String COLLECTION_NAME = 'messages';
+
   static CollectionReference getCollection() {
-    return Firestore.instance.collection('messages');
+    return Firestore.instance.collection(COLLECTION_NAME);
   }
 
   static Future<List<DocumentSnapshot>> getDocuments({int limit}) async {

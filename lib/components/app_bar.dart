@@ -31,7 +31,7 @@ AppBar CustomAppBar({@required title, List<Widget> actions}) => AppBar(
         ),
       ),
       toolbarHeight: 80,
-      shadowColor: Colors.red,
+      shadowColor: Colors.purple,
       elevation: 1,
       leading: Icon(
         Icons.chat_bubble_outline,

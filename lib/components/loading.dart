@@ -43,7 +43,7 @@ class Loading {
 
   Widget _getDefaultIndicator() => Center(
         child: CircularProgressIndicator(
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.amber,
         ),
       );
 
@@ -51,7 +51,7 @@ class Loading {
       padding: EdgeInsets.only(top: 20),
       child: Text(
         this.text,
-        style: GoogleFonts.pompiere(
+        style: GoogleFonts.alef(
             fontSize: 18, color: Colors.white, decoration: TextDecoration.none),
         textAlign: TextAlign.center,
       ));

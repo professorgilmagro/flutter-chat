@@ -21,21 +21,23 @@ LinearGradient LinearGradientDefault() => LinearGradient(
       colors: [HexColor("#690356"), HexColor("#8E0C76")],
     );
 
-Widget TextTitle(text, {padding, alignCenter}) {
-  return SimpleText(text,
-      size: 30.0, padding: padding, alignCenter: alignCenter);
+Widget TextTitle(text, {padding, bool alignCenter}) {
+  final align = alignCenter ? TextAlign.center : null;
+  return SimpleText(text, size: 30.0, padding: padding, align: align);
 }
 
 Widget TextSubtitle(text, {color, padding, alignCenter}) {
-  return SimpleText(text, size: 20.0, color: color, alignCenter: alignCenter);
+  final align = alignCenter ? TextAlign.center : null;
+  return SimpleText(text, size: 20.0, color: color, align: align);
 }
 
-Widget SimpleText(text, {padding, color, alignCenter, @required double size}) {
+Widget SimpleText(text,
+    {padding, color, TextAlign align, @required double size}) {
   return Padding(
     padding: padding ?? EdgeInsets.zero,
     child: Text(
       text,
-      textAlign: alignCenter ?? false ? TextAlign.center : TextAlign.left,
+      textAlign: align ?? TextAlign.left,
       style: GoogleFonts.abel(
           fontWeight: FontWeight.bold,
           fontSize: size,

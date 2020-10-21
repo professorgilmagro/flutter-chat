@@ -98,10 +98,23 @@ class _HomeState extends State<Home> {
                       setUploadingTo(true);
                       file.then((pickedFile) async {
                         if (pickedFile != null) {
-                          await Messenger(pickedFile: pickedFile).send();
+                          await Messenger(
+                            filePath: pickedFile.path,
+                            isImage: true,
+                          ).send();
                         }
                         setUploadingTo(false);
                       });
+                    },
+                    onFileAttach: (path, isTypeImage) async {
+                      setUploadingTo(true);
+                      if (path != null) {
+                        await Messenger(
+                          filePath: path,
+                          isImage: isTypeImage,
+                        ).send();
+                      }
+                      setUploadingTo(false);
                     },
                     onTextSubmitted: (text) => Messenger(text: text).send(),
                   ),

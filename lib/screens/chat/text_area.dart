@@ -1,3 +1,4 @@
+import 'package:chat_app/screens/chat/attach_file.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -5,8 +6,9 @@ import 'package:image_picker/image_picker.dart';
 class TextComposer extends StatefulWidget {
   final Function(String) onTextSubmitted;
   final Function(Future<PickedFile>) onCameraTap;
+  final Function(String, bool) onFileAttach;
 
-  TextComposer({this.onTextSubmitted, this.onCameraTap});
+  TextComposer({this.onTextSubmitted, this.onCameraTap, this.onFileAttach});
 
   @override
   _TextComposerState createState() => _TextComposerState();
@@ -53,9 +55,11 @@ class _TextComposerState extends State<TextComposer> {
             ),
           ),
           IconButton(
-            disabledColor: Colors.white70,
-            icon: Icon(Icons.send),
-            onPressed: _isComposing ? onSendMessage : null,
+            disabledColor: Colors.amber,
+            icon: Icon(_isComposing ? Icons.send : Icons.attach_file),
+            onPressed: () {
+              onSendMessage();
+            },
           )
         ],
       ),
@@ -70,7 +74,28 @@ class _TextComposerState extends State<TextComposer> {
   }
 
   onSendMessage() {
-    widget.onTextSubmitted(_controller.text);
-    _reset();
+    if (_isComposing) {
+      widget.onTextSubmitted(_controller.text);
+      _reset();
+    }
+
+    ShowAttachFileOptions(
+      context: context,
+      onGalleryTap: () async {
+        final picker =
+            await ImagePicker().getImage(source: ImageSource.gallery);
+        if (picker != null) {
+          widget.onFileAttach(picker.path, true);
+        }
+        Navigator.pop(context);
+      },
+      onFileTap: () {
+        print('oi');
+        // FilePickerResult result = await FilePicker.platform.pickFiles();
+        // if (result != null) {
+        //   widget.onFileAttach(result.files.single.path, false);
+        // }
+      },
+    );
   }
 }

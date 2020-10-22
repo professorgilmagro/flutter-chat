@@ -5,7 +5,7 @@ Widget ShowAttachFileOptions(
     {BuildContext context, Function onGalleryTap, Function onFileTap}) {
   showModalBottomSheet(
       context: context,
-      builder: (context) {
+      builder: (BuildContext context) {
         return BottomSheet(
             onClosing: () {},
             builder: (context) {
@@ -23,7 +23,7 @@ Widget ShowAttachFileOptions(
                       onPressed: onGalleryTap,
                     ),
                     Divider(
-                      color: Colors.black87,
+                      color: Colors.white24,
                     ),
                     FlatButton(
                       child: SimpleText('Arquivo', size: 20),

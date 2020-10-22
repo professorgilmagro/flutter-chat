@@ -12,6 +12,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -47,7 +48,7 @@ class _HomeState extends State<Home> {
     });
   }
 
-  setUploadingTo(bool value) {
+  showFileLoading(bool value) {
     setState(() {
       _isUploading = value;
     });
@@ -84,7 +85,13 @@ class _HomeState extends State<Home> {
                         }
 
                         final items = snapshot.data.documents.reversed.toList();
-                        return ChatMessage(documents: items);
+                        return ChatMessage(
+                            documents: items,
+                            onFileDownloadStart: () => showFileLoading(true),
+                            onFileDownloadEnd: (url) async {
+                              await launch(url);
+                              showFileLoading(false);
+                            });
                       },
                     ),
                   ),
@@ -95,7 +102,7 @@ class _HomeState extends State<Home> {
                       : Container(),
                   TextComposer(
                     onCameraTap: (Future<PickedFile> file) {
-                      setUploadingTo(true);
+                      showFileLoading(true);
                       file.then((pickedFile) async {
                         if (pickedFile != null) {
                           await Messenger(
@@ -103,18 +110,18 @@ class _HomeState extends State<Home> {
                             isImage: true,
                           ).send();
                         }
-                        setUploadingTo(false);
+                        showFileLoading(false);
                       });
                     },
                     onFileAttach: (path, isTypeImage) async {
-                      setUploadingTo(true);
+                      showFileLoading(true);
                       if (path != null) {
                         await Messenger(
                           filePath: path,
                           isImage: isTypeImage,
                         ).send();
                       }
-                      setUploadingTo(false);
+                      showFileLoading(false);
                     },
                     onTextSubmitted: (text) => Messenger(text: text).send(),
                   ),

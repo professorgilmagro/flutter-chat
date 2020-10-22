@@ -33,6 +33,14 @@ dependencies:
   hexcolor: ^1.0.4
   intl: ^0.16.1
   flutter_chat_bubble: ^1.0.2
+  file_picker: 2.0.8+1
+  mime_type: ^0.3.2
+  file_icon: ^0.3.0
+  url_launcher: ^5.7.6
+  flutter_android_downloader: ^0.0.2+1
+  downloads_path_provider: ^0.1.0
+  permission_handler: ^5.0.1+1
+  filesize: ^1.0.4
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

@@ -8,4 +8,8 @@ class ChatRepository {
   Future<void> push() async {
     return await DB.create(message.toMap());
   }
+
+  Future<void> save() async {
+    return await DB.update(id: message.id, data: message.toMap());
+  }
 }

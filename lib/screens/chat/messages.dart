@@ -1,18 +1,29 @@
+import 'dart:io';
+
 import 'package:chat_app/helpers/login.dart';
 import 'package:chat_app/models/message.dart';
+import 'package:chat_app/repository/chat.dart';
 import 'package:chat_app/theme/style.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_icon/file_icon.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_bubble/bubble_type.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_9.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
+import 'package:permission_handler/permission_handler.dart';
 
 class ChatMessage extends StatelessWidget {
   final List<DocumentSnapshot> documents;
+  final Function onFileDownloadStart;
+  final Function onFileDownloadEnd;
 
-  ChatMessage({@required this.documents});
+  ChatMessage(
+      {@required this.documents,
+      this.onFileDownloadStart,
+      this.onFileDownloadEnd});
 
   @override
   Widget build(BuildContext context) {
@@ -22,9 +33,35 @@ class ChatMessage extends StatelessWidget {
         reverse: true,
         itemBuilder: (context, index) {
           Message message = Message.fromMap(documents[index].data);
+          message.id = documents[index].documentID;
           return ChatMessageItem(
             message: message,
             currentUid: Auth().uid,
+            onFileDownloadTap: () async {
+              onFileDownloadStart();
+              var status = await Permission.storage.status;
+              if (!status.isGranted) {
+                await Permission.storage.request();
+              }
+
+              final attach = message.attachment;
+              final localUrl = await attach.localUrl;
+              final file = File(localUrl);
+              if (message.read && await file.exists()) {
+                return onFileDownloadEnd(localUrl);
+              }
+
+              http.Client client = http.Client();
+              var req = await client.get(Uri.parse(attach.url));
+              var bytes = req.bodyBytes;
+
+              await file.writeAsBytes(bytes);
+
+              message.markAsRead();
+              ChatRepository(message).save();
+
+              onFileDownloadEnd(localUrl);
+            },
           );
         });
   }
@@ -33,9 +70,14 @@ class ChatMessage extends StatelessWidget {
 class ChatMessageItem extends StatelessWidget {
   final Message message;
   final String currentUid;
+  final Function onFileDownloadTap;
+
   bool _isMine;
 
-  ChatMessageItem({@required this.message, @required this.currentUid});
+  ChatMessageItem(
+      {@required this.message,
+      @required this.currentUid,
+      this.onFileDownloadTap});
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +99,7 @@ class ChatMessageItem extends StatelessWidget {
               crossAxisAlignment:
                   _isMine ? CrossAxisAlignment.end : CrossAxisAlignment.start,
               children: [
-                _getContent(context, message),
+                _getBubble(context, message),
                 _getMessageInfo(message, _isMine),
               ],
             ),
@@ -81,14 +123,103 @@ class ChatMessageItem extends StatelessWidget {
         ),
       );
 
-  Widget _getContent(BuildContext context, Message message) {
-    Widget display = Text(
-      message.text ?? '',
-      style: GoogleFonts.abel(color: Colors.white),
+  Widget _getBubble(context, message) {
+    return ChatBubble(
+      clipper: ChatBubbleClipper9(
+          type: _isMine ? BubbleType.sendBubble : BubbleType.receiverBubble),
+      alignment: _isMine ? Alignment.bottomRight : Alignment.bottomLeft,
+      margin: EdgeInsets.only(top: 10),
+      backGroundColor: _isMine ? Colors.purple : Colors.deepPurple,
+      child: Container(
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width * 0.7,
+          minWidth: MediaQuery.of(context).size.width * 0.125,
+        ),
+        child: Column(
+          crossAxisAlignment:
+              _isMine ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+          children: [
+            _getContent(context, message),
+            Row(
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(right: 6, top: 10),
+                  child: Icon(
+                    message.read ? Icons.done_all : Icons.done,
+                    size: 18,
+                  ),
+                ),
+                SimpleText(message.readTime ?? '',
+                    size: 10,
+                    color: Colors.white60,
+                    padding: EdgeInsets.only(top: 10))
+              ],
+            )
+          ],
+        ),
+      ),
     );
+  }
+
+  Widget _getContent(BuildContext context, Message message) {
+    if (message.hasAttach()) {
+      return Container(
+        padding: EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: Color(0xFF0E3311).withOpacity(0.3),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: GestureDetector(
+          onTap: onFileDownloadTap,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: SimpleText(
+                      "Enviou um arquivo ${message.attachment.extension.toUpperCase()}",
+                      size: 12,
+                      color: Colors.amber,
+                      padding: EdgeInsets.all(10),
+                    ),
+                  ),
+                  SimpleText(
+                    message.attachment.sizeForHuman,
+                    size: 10,
+                    color: Colors.white54,
+                    padding: EdgeInsets.only(right: 25),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Icon(
+                    Icons.attach_file,
+                    color: Colors.white,
+                    size: 30,
+                  ),
+                  Expanded(
+                    child: SimpleText(
+                      message.attachment.name,
+                      size: 16,
+                      padding: EdgeInsets.only(left: 10),
+                    ),
+                  ),
+                  FileIcon(
+                    message.attachment.name,
+                    size: 60,
+                  )
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
     if (message.hasImage()) {
-      display = Container(
+      return Container(
         padding: EdgeInsets.only(bottom: 10),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
@@ -102,33 +233,9 @@ class ChatMessageItem extends StatelessWidget {
       );
     }
 
-    return ChatBubble(
-      clipper: ChatBubbleClipper9(
-          nipSize: 6,
-          type: _isMine ? BubbleType.sendBubble : BubbleType.receiverBubble),
-      alignment: _isMine ? Alignment.bottomRight : Alignment.bottomLeft,
-      margin: EdgeInsets.only(top: 10),
-      backGroundColor: _isMine ? Colors.amber[800] : Colors.purple,
-      child: Container(
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.7,
-          minWidth: MediaQuery.of(context).size.width * 0.125,
-        ),
-        child: Column(
-          crossAxisAlignment:
-              _isMine ? CrossAxisAlignment.start : CrossAxisAlignment.end,
-          children: [
-            display,
-            Padding(
-              padding: EdgeInsets.only(top: 10),
-              child: Icon(
-                message.read ? Icons.done_all : Icons.done,
-                size: 18,
-              ),
-            ),
-          ],
-        ),
-      ),
+    return Text(
+      message.text ?? '',
+      style: GoogleFonts.abel(color: Colors.white, fontSize: 14),
     );
   }
 

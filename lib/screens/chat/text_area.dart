@@ -1,4 +1,5 @@
 import 'package:chat_app/screens/chat/attach_file.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -58,7 +59,7 @@ class _TextComposerState extends State<TextComposer> {
             disabledColor: Colors.amber,
             icon: Icon(_isComposing ? Icons.send : Icons.attach_file),
             onPressed: () {
-              onSendMessage();
+              onSendMessage(showOptions: !_isComposing);
             },
           )
         ],
@@ -73,10 +74,14 @@ class _TextComposerState extends State<TextComposer> {
     });
   }
 
-  onSendMessage() {
+  onSendMessage({@required bool showOptions}) {
     if (_isComposing) {
       widget.onTextSubmitted(_controller.text);
-      _reset();
+      return _reset();
+    }
+
+    if (!showOptions) {
+      return;
     }
 
     ShowAttachFileOptions(
@@ -89,12 +94,12 @@ class _TextComposerState extends State<TextComposer> {
         }
         Navigator.pop(context);
       },
-      onFileTap: () {
-        print('oi');
-        // FilePickerResult result = await FilePicker.platform.pickFiles();
-        // if (result != null) {
-        //   widget.onFileAttach(result.files.single.path, false);
-        // }
+      onFileTap: () async {
+        FilePickerResult result = await FilePicker.platform.pickFiles();
+        if (result != null) {
+          widget.onFileAttach(result.files.single.path, false);
+        }
+        Navigator.pop(context);
       },
     );
   }

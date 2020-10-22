@@ -1,3 +1,4 @@
+import 'package:chat_app/models/attachment.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
@@ -9,22 +10,22 @@ class Message {
   String uid;
   String text;
   String imageUrl;
-  String attachmentUrl;
   String senderPhotoUrl;
   String senderName;
   DateTime readAt;
   DateTime sendAt;
   bool read;
+  Attachment attachment;
 
   Message({
     this.text,
     this.imageUrl,
-    this.attachmentUrl,
     this.senderName,
     this.senderPhotoUrl,
     this.uid,
     this.read,
     this.sendAt,
+    this.attachment,
   });
 
   String toString() {
@@ -45,23 +46,34 @@ class Message {
         : null;
   }
 
+  String get readTime {
+    _initDateFormatter();
+    return readAt != null ? DateFormat('H:m').format(readAt) : null;
+  }
+
   bool hasImage() {
     return imageUrl != null;
   }
 
   bool hasAttach() {
-    return attachmentUrl != null;
+    return attachment.url != null;
   }
 
   bool isMine(String uuid) {
     return this.uid == uuid;
   }
 
-  void setFileUrl({@required String url, @required bool attach}) {
+  void setFileInfo(
+      {@required String downloadUrl,
+      @required String localUrl,
+      @required bool attach,
+      int size}) {
     if (attach) {
-      this.attachmentUrl = url;
+      this.attachment = Attachment.fromFromUrl(localUrl);
+      this.attachment.url = downloadUrl;
+      this.attachment.size = size;
     } else {
-      this.imageUrl = url;
+      this.imageUrl = downloadUrl;
     }
   }
 
@@ -73,7 +85,7 @@ class Message {
       'sendAt': sendAt,
       'text': text,
       'imageUrl': imageUrl,
-      'attachmentUrl': attachmentUrl,
+      'attachment': attachment.toMap(),
       'sender': {
         'name': senderName,
         'photoUrl': senderPhotoUrl,
@@ -88,7 +100,7 @@ class Message {
     sendAt = data['sendAt'].toDate();
     text = data['text'] ?? null;
     imageUrl = data['imageUrl'] ?? null;
-    attachmentUrl = data['attachmentUrl'] ?? null;
+    attachment = Attachment.fromMap(data['attachment'] ?? null);
     senderName = data['sender']['name'] ?? null;
     senderPhotoUrl = data['sender']['photoUrl'] ?? null;
   }

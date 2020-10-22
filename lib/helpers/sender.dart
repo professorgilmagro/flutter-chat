@@ -16,13 +16,21 @@ class Messenger {
     Message message = _getMessageWithDefaultInformation();
 
     if (filePath != null) {
+      final file = File(filePath);
       final task = await FileStorage.upload(
-        file: File(filePath),
+        file: file,
         owner: Auth().uid,
       );
 
       String fileUrl = (await task.ref.getDownloadURL()).toString();
-      message.setFileUrl(url: fileUrl, attach: !isImage);
+
+      int fileSize = await file.length();
+      message.setFileInfo(
+        downloadUrl: fileUrl,
+        attach: !isImage,
+        localUrl: filePath,
+        size: fileSize,
+      );
     }
 
     if (text != null) {

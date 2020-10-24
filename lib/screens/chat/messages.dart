@@ -48,7 +48,7 @@ class ChatMessage extends StatelessWidget {
               final localUrl = await attach.localUrl;
               final file = File(localUrl);
               if (message.read && await file.exists()) {
-                return onFileDownloadEnd(localUrl);
+                return onFileDownloadEnd(localUrl, message.attachment.mineType);
               }
 
               http.Client client = http.Client();
@@ -60,7 +60,7 @@ class ChatMessage extends StatelessWidget {
               message.markAsRead();
               ChatRepository(message).save();
 
-              onFileDownloadEnd(localUrl);
+              onFileDownloadEnd(localUrl, message.attachment.mineType);
             },
           );
         });

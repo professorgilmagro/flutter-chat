@@ -13,7 +13,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:open_file/open_file.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -89,9 +89,9 @@ class _HomeState extends State<Home> {
                         return ChatMessage(
                             documents: items,
                             onFileDownloadStart: () => showFileLoading(true),
-                            onFileDownloadEnd: (url) async {
+                            onFileDownloadEnd: (url, mineType) async {
                               print(url);
-                              await launch(url);
+                              OpenFile.open(url, type: mineType);
                               showFileLoading(false);
                             });
                       },

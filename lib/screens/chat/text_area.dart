@@ -42,7 +42,7 @@ class _TextComposerState extends State<TextComposer> {
               height: 40,
               child: TextField(
                 controller: _controller,
-                style: GoogleFonts.asap(color: Colors.white, fontSize: 16),
+                style: GoogleFonts.abel(color: Colors.white, fontSize: 18),
                 cursorColor: Colors.yellow,
                 decoration: InputDecoration(
                   filled: true,
@@ -50,8 +50,12 @@ class _TextComposerState extends State<TextComposer> {
                   hintText: 'Enviar mensagem',
                   contentPadding: EdgeInsets.only(left: 20, right: 20),
                   hoverColor: Colors.purpleAccent,
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.purple),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(50),
+                    borderSide: BorderSide(color: Colors.grey, width: 0),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.amber),
                     borderRadius: BorderRadius.circular(50),
                   ),
                   hintStyle:

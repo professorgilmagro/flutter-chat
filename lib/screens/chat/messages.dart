@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:chat_app/helpers/login.dart';
 import 'package:chat_app/models/message.dart';
 import 'package:chat_app/repository/chat.dart';
-import 'package:chat_app/theme/style.dart';
+import 'package:chat_app/widgets/texts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_icon/file_icon.dart';
 import 'package:flutter/cupertino.dart';
@@ -36,7 +36,7 @@ class ChatMessage extends StatelessWidget {
           message.id = documents[index].documentID;
           return ChatMessageItem(
             message: message,
-            currentUid: Auth().uid,
+            isMine: message.isMine(Auth().uid),
             onFileDownloadTap: () async {
               onFileDownloadStart();
               var status = await Permission.storage.status;
@@ -69,25 +69,23 @@ class ChatMessage extends StatelessWidget {
 
 class ChatMessageItem extends StatelessWidget {
   final Message message;
-  final String currentUid;
   final Function onFileDownloadTap;
+  final bool isMine;
 
-  bool _isMine;
-
-  ChatMessageItem(
-      {@required this.message,
-      @required this.currentUid,
-      this.onFileDownloadTap});
+  ChatMessageItem({
+    @required this.message,
+    @required this.isMine,
+    this.onFileDownloadTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    _isMine = message.isMine(Auth().uid);
     return Container(
       padding: EdgeInsets.all(5),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          _isMine
+          isMine
               ? Container()
               : _getAvatar(
                   url: message.senderPhotoUrl,
@@ -97,14 +95,14 @@ class ChatMessageItem extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment:
-                  _isMine ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                  isMine ? CrossAxisAlignment.end : CrossAxisAlignment.start,
               children: [
                 _getBubble(context, message),
-                _getMessageInfo(message, _isMine),
+                _getMessageInfo(message, isMine),
               ],
             ),
           ),
-          _isMine
+          isMine
               ? _getAvatar(
                   url: message.senderPhotoUrl,
                   padding: EdgeInsets.only(right: 5, left: 5),
@@ -126,10 +124,10 @@ class ChatMessageItem extends StatelessWidget {
   Widget _getBubble(context, message) {
     return ChatBubble(
       clipper: ChatBubbleClipper9(
-          type: _isMine ? BubbleType.sendBubble : BubbleType.receiverBubble),
-      alignment: _isMine ? Alignment.bottomRight : Alignment.bottomLeft,
+          type: isMine ? BubbleType.sendBubble : BubbleType.receiverBubble),
+      alignment: isMine ? Alignment.bottomRight : Alignment.bottomLeft,
       margin: EdgeInsets.only(top: 10),
-      backGroundColor: _isMine ? Colors.purple : Colors.deepPurple,
+      backGroundColor: isMine ? Colors.purple : Colors.deepPurple,
       child: Container(
         constraints: BoxConstraints(
           maxWidth: MediaQuery.of(context).size.width * 0.7,
@@ -137,7 +135,7 @@ class ChatMessageItem extends StatelessWidget {
         ),
         child: Column(
           crossAxisAlignment:
-              _isMine ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+              isMine ? CrossAxisAlignment.start : CrossAxisAlignment.end,
           children: [
             _getContent(context, message),
             Row(
@@ -197,7 +195,7 @@ class ChatMessageItem extends StatelessWidget {
                   Icon(
                     Icons.attach_file,
                     color: Colors.white,
-                    size: 30,
+                    size: 25,
                   ),
                   Expanded(
                     child: SimpleText(

@@ -7,6 +7,7 @@ import 'package:chat_app/screens/chat/messages.dart';
 import 'package:chat_app/screens/chat/text_area.dart';
 import 'package:chat_app/storage/db.dart';
 import 'package:chat_app/theme/style.dart';
+import 'package:chat_app/widgets/texts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -89,6 +90,7 @@ class _HomeState extends State<Home> {
                             documents: items,
                             onFileDownloadStart: () => showFileLoading(true),
                             onFileDownloadEnd: (url) async {
+                              print(url);
                               await launch(url);
                               showFileLoading(false);
                             });

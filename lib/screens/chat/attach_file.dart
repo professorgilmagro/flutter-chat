@@ -1,4 +1,5 @@
 import 'package:chat_app/theme/style.dart';
+import 'package:chat_app/widgets/texts.dart';
 import 'package:flutter/material.dart';
 
 Widget ShowAttachFileOptions(

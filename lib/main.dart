@@ -6,6 +6,6 @@ void main() {
   runApp(MaterialApp(
     title: 'My Chat',
     home: Splash(),
-    theme: ChatAppTheme(),
+    theme: chatAppTheme(),
   ));
 }

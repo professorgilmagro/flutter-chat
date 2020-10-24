@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 
-AppBar ChatAppBar({@required title, Function onLeaveTap}) =>
-    CustomAppBar(title: title, actions: [LeaveAction(onTapped: onLeaveTap)]);
+AppBar chatAppBar({@required title, Function onLeaveTap}) =>
+    customAppBar(title: title, actions: [leaveAction(onTapped: onLeaveTap)]);
 
-Widget LeaveAction({Function onTapped}) {
+Widget leaveAction({Function onTapped}) {
   return Padding(
     padding: EdgeInsets.only(right: 10),
     child: Auth().isLogged()
@@ -23,7 +23,7 @@ Widget LeaveAction({Function onTapped}) {
   );
 }
 
-AppBar CustomAppBar({@required title, List<Widget> actions}) => AppBar(
+AppBar customAppBar({@required title, List<Widget> actions}) => AppBar(
       title: Text(
         title,
         style: GoogleFonts.acme(
@@ -45,7 +45,7 @@ AppBar CustomAppBar({@required title, List<Widget> actions}) => AppBar(
       actions: actions,
     );
 
-FloatingActionButton FloatingAddButtonAction({Function onPressed}) =>
+FloatingActionButton floatingAddButtonAction({Function onPressed}) =>
     FloatingActionButton(
       onPressed: onPressed,
       child: Icon(

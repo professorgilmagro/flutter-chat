@@ -59,7 +59,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      appBar: ChatAppBar(
+      appBar: chatAppBar(
         title: _title,
         onLeaveTap: () {
           SnackMessage(_scaffoldKey, 'Logout efetuado com sucesso!').show();
@@ -70,7 +70,7 @@ class _HomeState extends State<Home> {
         },
       ),
       body: Container(
-        decoration: BoxDecoration(gradient: LinearGradientDefault()),
+        decoration: BoxDecoration(gradient: linearGradientDefault()),
         child: (Auth().isLoginFails || Auth().isNotLogged())
             ? _notLoggedScreen()
             : Column(

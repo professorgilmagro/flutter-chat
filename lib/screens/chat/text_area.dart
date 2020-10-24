@@ -84,7 +84,7 @@ class _TextComposerState extends State<TextComposer> {
       return;
     }
 
-    ShowAttachFileOptions(
+    showAttachFileOptions(
       context: context,
       onGalleryTap: () async {
         final picker =

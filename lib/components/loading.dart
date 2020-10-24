@@ -11,7 +11,7 @@ class Loading {
 
   Widget build() {
     return Container(
-        decoration: BoxDecoration(gradient: LinearGradientDefault()),
+        decoration: BoxDecoration(gradient: linearGradientDefault()),
         child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,

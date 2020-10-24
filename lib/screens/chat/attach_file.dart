@@ -2,9 +2,9 @@ import 'package:chat_app/theme/style.dart';
 import 'package:chat_app/widgets/texts.dart';
 import 'package:flutter/material.dart';
 
-Widget ShowAttachFileOptions(
+Future<void> showAttachFileOptions(
     {BuildContext context, Function onGalleryTap, Function onFileTap}) {
-  showModalBottomSheet(
+  return showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
         return BottomSheet(
@@ -12,7 +12,7 @@ Widget ShowAttachFileOptions(
             builder: (context) {
               return Container(
                 decoration: BoxDecoration(
-                  gradient: LinearGradientDefault(),
+                  gradient: linearGradientDefault(),
                 ),
                 padding: EdgeInsets.all(10),
                 child: Column(

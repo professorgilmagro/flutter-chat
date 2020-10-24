@@ -42,6 +42,7 @@ dependencies:
   path_provider: ^1.6.21
   permission_handler: ^5.0.1+1
   filesize: ^1.0.4
+  animated_text_kit: ^2.4.1
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

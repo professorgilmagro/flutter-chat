@@ -56,7 +56,7 @@ class Message {
   }
 
   bool hasAttach() {
-    return attachment.url != null;
+    return attachment != null && attachment.url != null;
   }
 
   bool isMine(String uuid) {
@@ -85,7 +85,7 @@ class Message {
       'sendAt': sendAt,
       'text': text,
       'imageUrl': imageUrl,
-      'attachment': attachment.toMap(),
+      'attachment': hasAttach() ? attachment.toMap() : null,
       'sender': {
         'name': senderName,
         'photoUrl': senderPhotoUrl,

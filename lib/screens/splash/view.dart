@@ -1,6 +1,7 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:chat_app/screens/chat/home.dart';
-import 'package:chat_app/widgets/texts.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:splashscreen/splashscreen.dart';
 
@@ -20,7 +21,7 @@ Widget _introScreen() {
   return Stack(
     children: <Widget>[
       SplashScreen(
-        seconds: 3,
+        seconds: 7,
         gradientBackground: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
@@ -41,7 +42,31 @@ Widget _introScreen() {
                 size: 120,
               ),
             ),
-            SimpleText('My Chat', size: 30),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                SizedBox(width: 20.0, height: 50.0),
+                Text(
+                  "For ",
+                  style: GoogleFonts.aclonica(
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                      decoration: TextDecoration.none,
+                      color: Colors.white),
+                ),
+                RotateAnimatedTextKit(
+                    onTap: () {
+                      print("Tap Event");
+                    },
+                    text: ["ME", "YOU", "ALL"],
+                    textStyle: GoogleFonts.aclonica(
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold,
+                        decoration: TextDecoration.none,
+                        color: Colors.amber),
+                    textAlign: TextAlign.start),
+              ],
+            ),
           ],
         ),
       ),

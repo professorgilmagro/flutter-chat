@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:downloads_path_provider/downloads_path_provider.dart';
 import 'package:filesize/filesize.dart';
 import 'package:mime_type/mime_type.dart';
+import 'package:path_provider/path_provider.dart';
 
 class Attachment {
   String url;
@@ -48,7 +48,7 @@ class Attachment {
   }
 
   Future<String> get localUrl async {
-    Directory dir = await DownloadsPathProvider.downloadsDirectory;
+    Directory dir = await getApplicationDocumentsDirectory();
     return '${dir.path}/$name';
   }
 }

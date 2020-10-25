@@ -1,8 +1,10 @@
 import 'package:chat_app/helpers/downloader.dart';
 import 'package:chat_app/helpers/login.dart';
+import 'package:chat_app/helpers/share.dart';
 import 'package:chat_app/models/message.dart';
 import 'package:chat_app/repository/chat.dart';
 import 'package:chat_app/widgets/chat_slidable.dart';
+import 'package:chat_app/widgets/image/preview.dart';
 import 'package:chat_app/widgets/texts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_icon/file_icon.dart';
@@ -13,7 +15,6 @@ import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_9.dart';
 import 'package:google_fonts/google_fonts.dart';
 import "package:path/path.dart" show dirname;
-import 'package:share/share.dart';
 
 class ChatMessage extends StatelessWidget {
   final List<DocumentSnapshot> documents;
@@ -40,28 +41,13 @@ class ChatMessage extends StatelessWidget {
             message: message,
             isMine: message.isMine(Auth().uid),
             onShareTap: () async {
-              String subject = 'Envido por ${message.senderName} de My Chat';
-              if (message.text != null) {
-                Share.share(message.text, subject: subject);
-                return;
-              }
-
-              final attach =
-                  message.hasImage() ? message.image : message.attachment;
-              Downloader downloader = Downloader(
-                url: attach.url,
-                mineType: attach.mineType,
-                outputName: attach.name,
+              final messageShare = MessageShare(
+                message,
+                onStartProcess: onFileDownloadStart,
+                onEndProcess: onFileDownloadEnd,
               );
 
-              if (!await downloader.isDownloaded) {
-                onFileDownloadStart();
-                await downloader.download();
-                onFileDownloadEnd(
-                    await downloader.outputUrl, downloader.mineType);
-              }
-
-              Share.shareFiles([await downloader.outputUrl], subject: subject);
+              messageShare.share();
             },
             onFileDownloadTap: () async {
               onFileDownloadStart();
@@ -265,15 +251,28 @@ class ChatMessageItem extends StatelessWidget {
     }
 
     if (message.hasImage()) {
-      return Container(
-        padding: EdgeInsets.only(bottom: 10),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(8.0),
-          child: Image.network(
-            message.image.url,
+      return GestureDetector(
+        onDoubleTap: () {
+          showDialog(
+            context: context,
+            builder: (_) => ImagePreview(
+              url: message.image.url,
+              label: 'Visualizar imagem',
+              onDelete: () => ChatRepository(message).delete(),
+              onShare: onShareTap,
+            ),
+          );
+        },
+        child: Container(
+          padding: EdgeInsets.only(bottom: 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8.0),
+            child: Image.network(
+              message.image.url,
+            ),
           ),
         ),
       );

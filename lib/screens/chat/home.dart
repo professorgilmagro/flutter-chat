@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:audioplayers/audio_cache.dart';
 import 'package:chat_app/components/app_bar.dart';
 import 'package:chat_app/components/loading.dart';
@@ -8,6 +10,7 @@ import 'package:chat_app/screens/chat/messages.dart';
 import 'package:chat_app/screens/chat/text_area.dart';
 import 'package:chat_app/storage/db.dart';
 import 'package:chat_app/theme/style.dart';
+import 'package:chat_app/widgets/image/adjustment.dart';
 import 'package:chat_app/widgets/texts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -24,6 +27,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final _stateWaiting = [ConnectionState.waiting, ConnectionState.none];
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   bool _isUploading = false;
 
   String _title = '';
@@ -109,13 +113,24 @@ class _HomeState extends State<Home> {
                     onCameraTap: (Future<PickedFile> file) {
                       showFileLoading(true);
                       file.then((pickedFile) async {
-                        if (pickedFile != null) {
-                          await Messenger(
-                            filePath: pickedFile.path,
-                            isImage: true,
-                          ).send();
-                        }
                         showFileLoading(false);
+                        File imageFile = File(pickedFile.path);
+                        if (pickedFile != null) {
+                          showDialog(
+                            context: context,
+                            builder: (_) => ImageAdjustment(
+                              imageFile: imageFile,
+                              onDone: (finalFile) async {
+                                showFileLoading(true);
+                                await Messenger(
+                                  filePath: finalFile.path,
+                                  isImage: true,
+                                ).send();
+                                showFileLoading(false);
+                              },
+                            ),
+                          );
+                        }
                       });
                     },
                     onFileAttach: (path, isTypeImage) async {

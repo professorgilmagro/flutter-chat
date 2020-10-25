@@ -96,7 +96,6 @@ class Message {
   }
 
   Message.fromMap(Map<String, dynamic> data) {
-    print(data);
     id = data['id'] ?? null;
     uid = data['uid'] ?? null;
     read = data['read'] ?? false;

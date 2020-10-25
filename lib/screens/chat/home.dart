@@ -1,3 +1,4 @@
+import 'package:audioplayers/audio_cache.dart';
 import 'package:chat_app/components/app_bar.dart';
 import 'package:chat_app/components/loading.dart';
 import 'package:chat_app/components/snack.dart';
@@ -47,6 +48,9 @@ class _HomeState extends State<Home> {
         });
       }
     });
+
+    AudioCache player = AudioCache();
+    player.play("sounds/sms-alert-4.mp3");
   }
 
   showFileLoading(bool value) {

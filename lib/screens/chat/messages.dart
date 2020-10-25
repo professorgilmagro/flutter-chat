@@ -159,6 +159,8 @@ class ChatMessageItem extends StatelessWidget {
         clipper: ChatBubbleClipper9(
             type: isMine ? BubbleType.sendBubble : BubbleType.receiverBubble),
         alignment: isMine ? Alignment.bottomRight : Alignment.bottomLeft,
+        elevation: 1,
+        shadowColor: Colors.black54,
         margin: EdgeInsets.only(top: 10),
         backGroundColor: isMine ? Colors.purple : Colors.deepPurple,
         child: Container(

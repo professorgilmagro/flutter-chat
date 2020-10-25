@@ -21,6 +21,10 @@ Widget _introScreen() {
   return Stack(
     children: <Widget>[
       SplashScreen(
+        loadingText: Text(
+          'From codespace.com',
+          style: TextStyle(color: Colors.white),
+        ),
         seconds: 7,
         gradientBackground: LinearGradient(
           begin: Alignment.topCenter,
@@ -55,13 +59,14 @@ Widget _introScreen() {
                       color: Colors.white),
                 ),
                 RotateAnimatedTextKit(
-                    text: ["ME", "YOU", "ALL"],
-                    textStyle: GoogleFonts.aclonica(
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
-                        decoration: TextDecoration.none,
-                        color: Colors.amber),
-                    textAlign: TextAlign.start),
+                  text: ["ME", "YOU", "ALL"],
+                  textStyle: GoogleFonts.aclonica(
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                      decoration: TextDecoration.none,
+                      color: Colors.amber),
+                  textAlign: TextAlign.start,
+                ),
               ],
             ),
           ],

@@ -33,7 +33,7 @@ class DB {
 
   static collectionChangeDetect({Function onChanged}) {
     DB.getCollection().snapshots().listen((snapshot) {
-      onChanged(snapshot.documents);
+      onChanged(snapshot.documentChanges);
     });
   }
 

@@ -1,8 +1,8 @@
-import 'dart:io';
-
+import 'package:chat_app/helpers/downloader.dart';
 import 'package:chat_app/helpers/login.dart';
 import 'package:chat_app/models/message.dart';
 import 'package:chat_app/repository/chat.dart';
+import 'package:chat_app/widgets/chat_slidable.dart';
 import 'package:chat_app/widgets/texts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_icon/file_icon.dart';
@@ -12,8 +12,8 @@ import 'package:flutter_chat_bubble/bubble_type.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_9.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart' as http;
-import 'package:permission_handler/permission_handler.dart';
+import "package:path/path.dart" show dirname;
+import 'package:share/share.dart';
 
 class ChatMessage extends StatelessWidget {
   final List<DocumentSnapshot> documents;
@@ -32,35 +32,58 @@ class ChatMessage extends StatelessWidget {
         itemCount: documents.length,
         reverse: true,
         itemBuilder: (context, index) {
-          Message message = Message.fromMap(documents[index].data);
-          message.id = documents[index].documentID;
+          final data = documents[index].data;
+          data['id'] = documents[index].documentID;
+          Message message = Message.fromMap(data);
+
           return ChatMessageItem(
             message: message,
             isMine: message.isMine(Auth().uid),
+            onShareTap: () async {
+              String subject = 'Envido por ${message.senderName} de My Chat';
+              if (message.text != null) {
+                Share.share(message.text, subject: subject);
+                return;
+              }
+
+              final attach =
+                  message.hasImage() ? message.image : message.attachment;
+              Downloader downloader = Downloader(
+                url: attach.url,
+                mineType: attach.mineType,
+                outputName: attach.name,
+              );
+
+              if (!await downloader.isDownloaded) {
+                onFileDownloadStart();
+                await downloader.download();
+                onFileDownloadEnd(
+                    await downloader.outputUrl, downloader.mineType);
+              }
+
+              Share.shareFiles([await downloader.outputUrl], subject: subject);
+            },
             onFileDownloadTap: () async {
               onFileDownloadStart();
-              var status = await Permission.storage.status;
-              if (!status.isGranted) {
-                await Permission.storage.request();
+              final localUrl = await message.attachment.localUrl;
+              final downloader = Downloader(
+                url: message.attachment.url,
+                outputName: message.attachment.name,
+                mineType: message.attachment.mineType,
+                outputDir: dirname(localUrl),
+              );
+
+              if (await downloader.isDownloaded) {
+                return onFileDownloadEnd(localUrl, downloader.mineType);
               }
 
-              final attach = message.attachment;
-              final localUrl = await attach.localUrl;
-              final file = File(localUrl);
-              if (message.read && await file.exists()) {
-                return onFileDownloadEnd(localUrl, message.attachment.mineType);
-              }
-
-              http.Client client = http.Client();
-              var req = await client.get(Uri.parse(attach.url));
-              var bytes = req.bodyBytes;
-
-              await file.writeAsBytes(bytes);
-
-              message.markAsRead();
-              ChatRepository(message).save();
-
-              onFileDownloadEnd(localUrl, message.attachment.mineType);
+              downloader.download().then((outputUrl) {
+                if (!message.read) {
+                  message.markAsRead();
+                  ChatRepository(message).save();
+                }
+                onFileDownloadEnd(outputUrl, message.attachment.mineType);
+              });
             },
           );
         });
@@ -70,12 +93,14 @@ class ChatMessage extends StatelessWidget {
 class ChatMessageItem extends StatelessWidget {
   final Message message;
   final Function onFileDownloadTap;
+  final Function onShareTap;
   final bool isMine;
 
   ChatMessageItem({
     @required this.message,
     @required this.isMine,
     this.onFileDownloadTap,
+    this.onShareTap,
   });
 
   @override
@@ -121,39 +146,60 @@ class ChatMessageItem extends StatelessWidget {
         ),
       );
 
-  Widget _getBubble(context, message) {
-    return ChatBubble(
-      clipper: ChatBubbleClipper9(
-          type: isMine ? BubbleType.sendBubble : BubbleType.receiverBubble),
-      alignment: isMine ? Alignment.bottomRight : Alignment.bottomLeft,
-      margin: EdgeInsets.only(top: 10),
-      backGroundColor: isMine ? Colors.purple : Colors.deepPurple,
-      child: Container(
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.7,
-          minWidth: MediaQuery.of(context).size.width * 0.125,
-        ),
-        child: Column(
-          crossAxisAlignment:
-              isMine ? CrossAxisAlignment.start : CrossAxisAlignment.end,
-          children: [
-            _getContent(context, message),
-            Row(
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(right: 6, top: 10),
-                  child: Icon(
-                    message.read ? Icons.done_all : Icons.done,
-                    size: 18,
+  Widget _getBubble(context, Message message) {
+    return ChatSlidable(
+      isRead: message.read,
+      onDeleteTap: () => ChatRepository(message).delete(),
+      onMarkTap: () {
+        message.read ? message.markAsUnread() : message.markAsRead();
+        ChatRepository(message).save();
+      },
+      onShareTap: onShareTap,
+      child: ChatBubble(
+        clipper: ChatBubbleClipper9(
+            type: isMine ? BubbleType.sendBubble : BubbleType.receiverBubble),
+        alignment: isMine ? Alignment.bottomRight : Alignment.bottomLeft,
+        margin: EdgeInsets.only(top: 10),
+        backGroundColor: isMine ? Colors.purple : Colors.deepPurple,
+        child: Container(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.7,
+            minWidth: MediaQuery.of(context).size.width * 0.125,
+          ),
+          child: Column(
+            crossAxisAlignment:
+                isMine ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+            children: [
+              _getContent(context, message),
+              Row(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(right: 6, top: 10),
+                    child: Icon(
+                      message.read ? Icons.done_all : Icons.done,
+                      size: 18,
+                    ),
                   ),
-                ),
-                SimpleText(message.readTime ?? '',
-                    size: 10,
-                    color: Colors.white60,
-                    padding: EdgeInsets.only(top: 10))
-              ],
-            )
-          ],
+                  Expanded(
+                    child: SimpleText(
+                      message.readTime ?? '',
+                      size: 10,
+                      color: Colors.white60,
+                      padding: EdgeInsets.only(top: 10),
+                    ),
+                  ),
+                  message.hasImage()
+                      ? SimpleText(
+                          message.image.sizeForHuman,
+                          padding: EdgeInsets.only(top: 10),
+                          color: Colors.white60,
+                          size: 10,
+                        )
+                      : Container(),
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -225,7 +271,7 @@ class ChatMessageItem extends StatelessWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(8.0),
           child: Image.network(
-            message.imageUrl,
+            message.image.url,
           ),
         ),
       );

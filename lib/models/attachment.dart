@@ -51,4 +51,8 @@ class Attachment {
     Directory dir = await getApplicationDocumentsDirectory();
     return '${dir.path}/$name';
   }
+
+  Future<bool> isDownloaded() async {
+    return File(await localUrl).existsSync();
+  }
 }

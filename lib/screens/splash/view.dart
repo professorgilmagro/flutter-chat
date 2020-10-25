@@ -55,9 +55,6 @@ Widget _introScreen() {
                       color: Colors.white),
                 ),
                 RotateAnimatedTextKit(
-                    onTap: () {
-                      print("Tap Event");
-                    },
                     text: ["ME", "YOU", "ALL"],
                     textStyle: GoogleFonts.aclonica(
                         fontSize: 25,

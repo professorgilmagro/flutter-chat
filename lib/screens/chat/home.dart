@@ -90,7 +90,6 @@ class _HomeState extends State<Home> {
                             documents: items,
                             onFileDownloadStart: () => showFileLoading(true),
                             onFileDownloadEnd: (url, mineType) async {
-                              print(url);
                               OpenFile.open(url, type: mineType);
                               showFileLoading(false);
                             });

@@ -23,6 +23,10 @@ class DB {
     return await DB.getCollection().document(id).updateData(data);
   }
 
+  static Future<void> delete(dynamic id) async {
+    return await DB.getCollection().document(id).delete();
+  }
+
   static Future<DocumentSnapshot> findById(String id) async {
     return await DB.getCollection().document(id).get();
   }

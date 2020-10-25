@@ -9,7 +9,7 @@ class Message {
   String id;
   String uid;
   String text;
-  String imageUrl;
+  Attachment image;
   String senderPhotoUrl;
   String senderName;
   DateTime readAt;
@@ -19,7 +19,7 @@ class Message {
 
   Message({
     this.text,
-    this.imageUrl,
+    this.image,
     this.senderName,
     this.senderPhotoUrl,
     this.uid,
@@ -52,7 +52,7 @@ class Message {
   }
 
   bool hasImage() {
-    return imageUrl != null;
+    return image != null && image.url != null;
   }
 
   bool hasAttach() {
@@ -68,12 +68,14 @@ class Message {
       @required String localUrl,
       @required bool attach,
       int size}) {
+    final fileInfo = Attachment.fromFromUrl(localUrl);
+    fileInfo.url = downloadUrl;
+    fileInfo.size = size;
+
     if (attach) {
-      this.attachment = Attachment.fromFromUrl(localUrl);
-      this.attachment.url = downloadUrl;
-      this.attachment.size = size;
+      this.attachment = fileInfo;
     } else {
-      this.imageUrl = downloadUrl;
+      this.image = fileInfo;
     }
   }
 
@@ -84,7 +86,7 @@ class Message {
       'readAt': readAt,
       'sendAt': sendAt,
       'text': text,
-      'imageUrl': imageUrl,
+      'image': hasImage() ? image.toMap() : null,
       'attachment': hasAttach() ? attachment.toMap() : null,
       'sender': {
         'name': senderName,
@@ -94,15 +96,28 @@ class Message {
   }
 
   Message.fromMap(Map<String, dynamic> data) {
+    print(data);
+    id = data['id'] ?? null;
     uid = data['uid'] ?? null;
     read = data['read'] ?? false;
     readAt = data['readAt'] != null ? data['readAt'].toDate() : null;
     sendAt = data['sendAt'].toDate();
     text = data['text'] ?? null;
-    imageUrl = data['imageUrl'] ?? null;
     attachment = Attachment.fromMap(data['attachment'] ?? null);
     senderName = data['sender']['name'] ?? null;
     senderPhotoUrl = data['sender']['photoUrl'] ?? null;
+    _fillImage(data);
+  }
+
+  void _fillImage(Map<String, dynamic> data) {
+    if (data['imageUrl'] != null && data['imageUrl'].toString().isNotEmpty) {
+      image = Attachment.fromFromUrl(data['imageUrl']);
+      image.url = data['imageUrl'];
+      image.name = '$id.jpg';
+      return;
+    }
+
+    image = Attachment.fromMap(data['image'] ?? null);
   }
 
   markAsRead() {

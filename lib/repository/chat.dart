@@ -12,4 +12,8 @@ class ChatRepository {
   Future<void> save() async {
     return await DB.update(id: message.id, data: message.toMap());
   }
+
+  Future<void> delete() async {
+    return await DB.delete(message.id);
+  }
 }

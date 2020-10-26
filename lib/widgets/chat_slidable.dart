@@ -7,6 +7,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 class ChatSlidable extends StatelessWidget {
   final Widget child;
   final bool isRead;
+  final bool canDelete;
   final Function onDeleteTap;
   final Function onShareTap;
   final Function onMarkTap;
@@ -15,6 +16,7 @@ class ChatSlidable extends StatelessWidget {
   ChatSlidable({
     @required this.child,
     @required this.isRead,
+    @required this.canDelete,
     this.onDeleteTap,
     this.onMarkTap,
     this.onMoreTap,
@@ -50,10 +52,10 @@ class ChatSlidable extends StatelessWidget {
             onTap: onMoreTap,
           ),
           ChatSlideAction(
-            color: Colors.red[900],
+            color: canDelete ? Colors.red[900] : Colors.white38,
             caption: 'Delete',
-            iconData: Icons.delete,
-            onTap: onDeleteTap,
+            iconData: canDelete ? Icons.delete : Icons.delete_forever,
+            onTap: canDelete ? onDeleteTap : null,
           ),
         ]);
   }

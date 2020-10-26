@@ -137,6 +137,7 @@ class ChatMessageItem extends StatelessWidget {
   Widget _getBubble(context, Message message) {
     return ChatSlidable(
       isRead: message.read,
+      canDelete: isMine,
       onDeleteTap: () => _delete(message),
       onMarkTap: () {
         message.read ? message.markAsUnread() : message.markAsRead();

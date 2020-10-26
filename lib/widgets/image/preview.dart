@@ -20,7 +20,6 @@ class ImagePreview extends StatelessWidget {
 
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black54,
       appBar: AppBar(
         backgroundColor: HexColor("#690356"),
         title: TextSubtitle(
@@ -29,12 +28,16 @@ class ImagePreview extends StatelessWidget {
         ),
       ),
       body: Container(
+        color: Colors.black54,
         child: PhotoView(
           imageProvider: NetworkImage(url),
           enableRotation: true,
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: HexColor("#690356"),
+        fixedColor: Colors.white,
+        unselectedItemColor: Colors.white,
         onTap: (index) async {
           switch (index) {
             case 0:

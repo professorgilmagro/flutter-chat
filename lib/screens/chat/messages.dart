@@ -1,3 +1,4 @@
+import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:chat_app/helpers/downloader.dart';
 import 'package:chat_app/helpers/login.dart';
 import 'package:chat_app/helpers/share.dart';
@@ -15,6 +16,7 @@ import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_9.dart';
 import 'package:google_fonts/google_fonts.dart';
 import "package:path/path.dart" show dirname;
+import 'package:permission_handler/permission_handler.dart';
 
 class ChatMessage extends StatelessWidget {
   final List<DocumentSnapshot> documents;
@@ -135,7 +137,7 @@ class ChatMessageItem extends StatelessWidget {
   Widget _getBubble(context, Message message) {
     return ChatSlidable(
       isRead: message.read,
-      onDeleteTap: () => ChatRepository(message).delete(),
+      onDeleteTap: () => _delete(message),
       onMarkTap: () {
         message.read ? message.markAsUnread() : message.markAsRead();
         ChatRepository(message).save();
@@ -252,13 +254,13 @@ class ChatMessageItem extends StatelessWidget {
 
     if (message.hasImage()) {
       return GestureDetector(
-        onDoubleTap: () {
+        onTap: () {
           showDialog(
             context: context,
             builder: (_) => ImagePreview(
               url: message.image.url,
               label: 'Visualizar imagem',
-              onDelete: () => ChatRepository(message).delete(),
+              onDelete: () => _delete(message),
               onShare: onShareTap,
             ),
           );
@@ -301,5 +303,14 @@ class ChatMessageItem extends StatelessWidget {
         mainAxisAlignment:
             alignEnd ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: alignEnd ? items.reversed.toList() : items);
+  }
+
+  _delete(Message message) async {
+    PermissionStatus status = await Permission.storage.status;
+    if (!status.isGranted) {
+      await Permission.storage.request();
+    }
+    await ChatRepository(message).delete();
+    AssetsAudioPlayer.newPlayer().open(Audio("assets/sounds/spear-throw.mp3"));
   }
 }
